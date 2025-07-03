@@ -1,0 +1,10 @@
+<view class="container">
+  <view class="title">球员得分排名</view>
+  <view class="ranking-list" style="margin:16px 0;">
+    <view wx:for="{{ranking}}" wx:for-index="idx" wx:for-item="item" wx:key="player">
+      <view style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #eee;">
+        <text style="flex:1;">{{idx+1}}. {{item.player}} {{item.win}}：{{item.lose}} {{item.smallPoints}}分</text>
+      </view>
+    </view>
+  </view>
+</view>

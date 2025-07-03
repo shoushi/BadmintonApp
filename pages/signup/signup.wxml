@@ -1,0 +1,13 @@
+<view class="container">
+  <view class="title">球员报名</view>
+  <view style="margin-bottom:16px;">
+    <text>球员人数：{{playerCount}}</text>
+  </view>
+  <view style="margin-bottom:16px;">
+    <text>球员名单：</text>
+    <view wx:for="{{players}}" wx:for-index="idx" wx:for-item="name" wx:key="idx" style="margin-bottom:8px;">
+      <input placeholder="请输入球员姓名" value="{{name}}" data-idx="{{idx}}" bindinput="updatePlayerName" />
+    </view>
+  </view>
+  <button bindtap="confirmSignup" disabled="{{!canSignup}}">完成报名</button>
+</view>

@@ -1,0 +1,17 @@
+<!--playerInput.wxml-->
+<view class="container">
+  <view class="title">创建对战</view>
+  <view style="margin-bottom:16px;">
+    <text>球员人数：</text>
+    <input type="number" value="{{playerCount}}" bindinput="inputPlayerCount" placeholder="请输入球员人数" />
+  </view>
+  <view style="margin-bottom:16px;">
+    <text>对战轮数：</text>
+    <input type="number" value="{{roundCount}}" bindinput="inputRoundCount" placeholder="请输入对战轮数" />
+  </view>
+  <view style="margin-bottom:16px;">
+    <text>场地数：</text>
+    <input type="number" value="{{courtCount}}" bindinput="inputCourtCount" placeholder="请输入场地数" />
+  </view>
+  <button bindtap="gotoSignup" disabled="{{!canGoSignup}}">去报名</button>
+</view>

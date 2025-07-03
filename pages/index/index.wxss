@@ -1,0 +1,16 @@
+/**index.wxss**/
+.container {
+  padding: 20px;
+  text-align: center;
+}
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+button {
+  padding: 10px 20px;
+  background-color: #007AFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}

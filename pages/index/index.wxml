@@ -1,0 +1,20 @@
+<!--index.wxml-->
+<view class="container" style="padding:32px 16px;">
+  <view class="title" style="font-size:28px;font-weight:bold;text-align:center;margin-bottom:32px;color:#007aff;">
+    羽毛球比赛助手
+  </view>
+  <view style="display:flex;flex-direction:column;gap:20px;align-items:center;">
+    <button class="main-btn" style="background:#34c759;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToPlayerInput">
+      <image src="/images/create.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 创建比赛
+    </button>
+    <button class="main-btn" style="background:#007aff;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToSignup">
+      <image src="/images/signup.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 球员报名
+    </button>
+    <button class="main-btn" style="background:#ff9500;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToMatchTable">
+      <image src="/images/match.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 对战信息
+    </button>
+    <button class="main-btn" style="background:#5856d6;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToRanking">
+      <image src="/images/ranking.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 得分排名
+    </button>
+  </view>
+</view>

@@ -1,0 +1,36 @@
+<!--matchTable.wxml-->
+<view class="container">
+  <view class="title">比赛对阵表</view>
+  <view class="match-table">
+    <view wx:for="{{schedule}}" wx:for-index="index" wx:for-item="item" wx:key="round">
+      <view style="margin-top:16px;font-weight:bold;">第{{index+1}}轮</view>
+      <view wx:for="{{item}}" wx:for-index="idx" wx:for-item="court" wx:key="court">
+        <text>
+          场地{{idx+1}}：【{{court[0]}}，{{court[1]}} VS {{court[2]}}，{{court[3]}}】
+        </text>
+        <view style="margin:4px 0;display:flex;align-items:center;">
+          <picker mode="selector" range="{{scoreRange}}" 
+            value="{{scoreRange.indexOf(scores[index][idx].left)}}" 
+            data-round="{{index}}" data-court="{{idx}}" data-side="left" 
+            bindchange="pickerScore">
+            <view class="picker" style="width:50px;text-align:center;">
+              {{scores[index][idx].left}}
+            </view>
+          </picker>
+          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="left" bindtap="addScore">+</button>
+          <text style="margin:0 8px;"> : </text>
+          <picker mode="selector" range="{{scoreRange}}" 
+            value="{{scoreRange.indexOf(scores[index][idx].right)}}" 
+            data-round="{{index}}" data-court="{{idx}}" data-side="right" 
+            bindchange="pickerScore">
+            <view class="picker" style="width:50px;text-align:center;">
+              {{scores[index][idx].right}}
+            </view>
+          </picker>
+          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="right" bindtap="addScore">+</button>
+        </view>
+      </view>
+    </view>
+  </view>  
+</view>
+

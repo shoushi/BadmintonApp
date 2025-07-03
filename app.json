@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/playerInput/playerInput",
+    "pages/matchTable/matchTable",
+    "pages/ranking/ranking",
+    "pages/signup/signup"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "BadmintonApp",
+    "navigationBarTextStyle": "black"
+  },
+  "renderer": "webview",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
