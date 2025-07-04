@@ -5,6 +5,7 @@ Page({
   data: {
     playerCount: 0,
     players: [],
+    signed: [], // 新增：记录每行是否已报名
     canSignup: false,
     created: false
   },
@@ -12,13 +13,18 @@ Page({
     const playerCount = app.globalData.playerCount || 8
     // 优先从本地恢复球员名单
     const savedPlayers = wx.getStorageSync('match_players')
+    const savedSigned = wx.getStorageSync('match_signed')
     const players = savedPlayers && savedPlayers.length === playerCount
       ? savedPlayers
       : Array.from({ length: playerCount }, () => '')
-    this.setData({ playerCount, players })
+    const signed = savedSigned && savedSigned.length === playerCount
+      ? savedSigned
+      : Array.from({ length: playerCount }, () => false)
+    this.setData({ playerCount, players, signed })
   },
   updatePlayerName(e) {
     const idx = Number(e.currentTarget.dataset.idx)
+    if (this.data.signed[idx]) return; // 已报名不可修改
     const value = e.detail.value
     const players = this.data.players
     players[idx] = value
@@ -37,20 +43,14 @@ Page({
   confirmSignup() {
     const { players } = this.data
     const validPlayers = players.filter(name => name && name.trim())
-    const roundCount = app.globalData.roundCount || 9
     const courtCount = app.globalData.courtCount || 3
-
-    // 记录报名信息
-    app.globalData.signupInfo = {
-      players: validPlayers,
-      playerCount: validPlayers.length,
-      signupTime: Date.now()
-    }
-
-    // 自动生成对战信息
-    const schedule = badmintonSchedule(validPlayers, courtCount, 4, 6, roundCount)
+    // 自动生成对战信息，不再传 roundCount，由算法自动补齐
+    const schedule = badmintonSchedule(validPlayers, courtCount, 4)
     app.globalData.schedule = schedule
-
+    // 禁用所有输入框和报名按钮
+    this.setData({
+      signed: Array.from({ length: this.data.playerCount }, () => true)
+    })
     // 弹窗提示并返回主页
     wx.showToast({
       title: '创建成功',
@@ -89,16 +89,23 @@ Page({
   signupPlayer(e) {
     const idx = Number(e.currentTarget.dataset.idx)
     const players = this.data.players
+    const signed = this.data.signed
     const name = players[idx]
     if (!name || !name.trim()) {
       wx.showToast({ title: '请输入球员姓名', icon: 'none' })
       return
     }
-    // 标记该球员已报名（可扩展为对象，现直接保存字符串）
+    // 判重：除本行外不能有同名
+    if (players.some((n, i) => i !== idx && n.trim && n.trim() === name.trim())) {
+      wx.showToast({ title: '姓名已被占用', icon: 'none' })
+      return
+    }
     players[idx] = name.trim()
-    this.setData({ players }, () => {
+    signed[idx] = true
+    this.setData({ players, signed }, () => {
       this.checkCanSignup()
       wx.setStorageSync('match_players', players)
+      wx.setStorageSync('match_signed', signed)
       app.globalData.players = players
       wx.showToast({ title: '报名成功', icon: 'success', duration: 800 })
     })

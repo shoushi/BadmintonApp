@@ -3,31 +3,32 @@
   <view class="title">比赛对阵表</view>
   <view class="match-table">
     <view wx:for="{{schedule}}" wx:for-index="index" wx:for-item="item" wx:key="round">
-      <view style="margin-top:16px;font-weight:bold;">第{{index+1}}轮</view>
-      <view wx:for="{{item}}" wx:for-index="idx" wx:for-item="court" wx:key="court">
-        <text>
-          场地{{idx+1}}：【{{court[0]}}，{{court[1]}} VS {{court[2]}}，{{court[3]}}】
-        </text>
-        <view style="margin:4px 0;display:flex;align-items:center;">
+      <view style="margin-top:16px;font-weight:bold;background:#f7f7f7;padding:6px 0;border-radius:4px;">第{{index+1}}轮</view>
+      <view wx:for="{{item}}" wx:for-index="idx" wx:for-item="court" wx:key="court" style="margin-bottom:12px;">
+        <view style="display:flex;align-items:center;">
+          <text style="font-weight:bold;width:60px;">场地{{idx+1}}</text>
+          <text style="flex:1;">【{{court[0]}}，{{court[1]}} <text style="color:#1aad19;">VS</text> {{court[2]}}，{{court[3]}}】</text>
+        </view>
+        <view style="margin:4px 0 0 60px;display:flex;align-items:center;">
           <picker mode="selector" range="{{scoreRange}}" 
             value="{{scoreRange.indexOf(scores[index][idx].left)}}" 
             data-round="{{index}}" data-court="{{idx}}" data-side="left" 
             bindchange="pickerScore">
-            <view class="picker" style="width:50px;text-align:center;">
+            <view class="picker" style="width:50px;text-align:center;background:#fff;border:1px solid #eee;border-radius:4px;">
               {{scores[index][idx].left}}
             </view>
           </picker>
-          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="left" bindtap="addScore">+</button>
-          <text style="margin:0 8px;"> : </text>
+          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="left" bindtap="addScore" style="margin:0 4px;" wx:if="{{scores[index][idx].left >= 21}}">+</button>
+          <text style="margin:0 8px;font-weight:bold;"> : </text>
           <picker mode="selector" range="{{scoreRange}}" 
             value="{{scoreRange.indexOf(scores[index][idx].right)}}" 
             data-round="{{index}}" data-court="{{idx}}" data-side="right" 
             bindchange="pickerScore">
-            <view class="picker" style="width:50px;text-align:center;">
+            <view class="picker" style="width:50px;text-align:center;background:#fff;border:1px solid #eee;border-radius:4px;">
               {{scores[index][idx].right}}
             </view>
           </picker>
-          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="right" bindtap="addScore">+</button>
+          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="right" bindtap="addScore" style="margin-left:4px;" wx:if="{{scores[index][idx].right >= 21}}">+</button>
         </view>
       </view>
     </view>

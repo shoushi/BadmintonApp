@@ -1,9 +1,20 @@
 <view class="container">
   <view class="title">球员得分排名</view>
   <view class="ranking-list" style="margin:16px 0;">
+    <view style="display:flex;font-weight:bold;padding:8px 0;border-bottom:2px solid #bbb;background:#f7f7f7;">
+      <text style="width:40px;text-align:center;">排名</text>
+      <text style="flex:1;">球员</text>
+      <text style="width:60px;text-align:center;">胜场</text>
+      <text style="width:60px;text-align:center;">负场</text>
+      <text style="width:60px;text-align:center;">小分</text>
+    </view>
     <view wx:for="{{ranking}}" wx:for-index="idx" wx:for-item="item" wx:key="player">
       <view style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #eee;">
-        <text style="flex:1;">{{idx+1}}. {{item.player}} {{item.win}}：{{item.lose}} {{item.smallPoints}}分</text>
+        <text style="width:40px;text-align:center;">{{idx+1}}</text>
+        <text style="flex:1;">{{item.player}}</text>
+        <text style="width:60px;text-align:center;">{{item.win}}</text>
+        <text style="width:60px;text-align:center;">{{item.lose}}</text>
+        <text style="width:60px;text-align:center;">{{item.smallPoints}}</text>
       </view>
     </view>
   </view>

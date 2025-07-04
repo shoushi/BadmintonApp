@@ -6,7 +6,7 @@ Page({
   data: {
     playerCount: 8,
     roundCount: 9,
-    courtCount: 3,
+    courtCount: 1,
     canGoSignup: true
   },
   onLoad: function () {
@@ -49,10 +49,13 @@ Page({
   },
   // 将 gotoSignup 方法修改为直接跳转主页
   gotoSignup() {
+    // 新建比赛时清除缓存中的队员信息
+    wx.removeStorageSync('match_players');
+    wx.removeStorageSync('match_signed');
     app.globalData.playerCount = this.data.playerCount
-    app.globalData.roundCount = this.data.roundCount
     app.globalData.courtCount = this.data.courtCount
-    wx.reLaunch({ url: '/pages/index/index' })
+    app.globalData.shouldResetSignup = true; // 标记报名页需重置
+    wx.navigateTo({ url: '/pages/signup/signup' })
   },
   generateMatches() {
     const players = app.globalData.players || []
