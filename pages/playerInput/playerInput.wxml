@@ -13,5 +13,5 @@
     <text>场地数：</text>
     <input type="number" value="{{courtCount}}" bindinput="inputCourtCount" placeholder="请输入场地数" />
   </view>
-  <button bindtap="gotoSignup" disabled="{{!canGoSignup}}">去报名</button>
+  <button bindtap="gotoSignup" disabled="{{!canGoSignup}}">完成</button>
 </view>

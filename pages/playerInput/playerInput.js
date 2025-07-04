@@ -47,11 +47,12 @@ Page({
   checkCanGoSignup() {
     this.setData({ canGoSignup: this.data.playerCount >= 4 })
   },
+  // 将 gotoSignup 方法修改为直接跳转主页
   gotoSignup() {
     app.globalData.playerCount = this.data.playerCount
     app.globalData.roundCount = this.data.roundCount
     app.globalData.courtCount = this.data.courtCount
-    wx.navigateTo({ url: '../signup/signup' })
+    wx.reLaunch({ url: '/pages/index/index' })
   },
   generateMatches() {
     const players = app.globalData.players || []
@@ -75,5 +76,10 @@ Page({
 
     // 保存排名
     wx.setStorageSync('match_ranking', this.data.ranking || [])
-  }
+  },
+  goHome() {
+    wx.reLaunch({
+      url: '/pages/index/index'
+    })
+  },
 })
