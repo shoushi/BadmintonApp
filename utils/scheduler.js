@@ -24,8 +24,24 @@ function isPlayedLastThree(dq) {
   return dq.length === 3 && dq.every(Boolean);
 }
 
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPerPlayer) {
-  const sorted = [...players].sort((a, b) => playCount[a] - playCount[b]);
+  const shuffledPlayers = [...players];
+  shuffleArray(shuffledPlayers);
+  const sorted = shuffledPlayers.sort((a, b) => playCount[a] - playCount[b]);
   // 1. 优先选搭档全新组合
   for (let i = 0; i < sorted.length; i++) {
     let a = sorted[i];
