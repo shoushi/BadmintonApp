@@ -5,9 +5,17 @@
   </view>
   <view style="margin-bottom:16px;">
     <text>球员名单：</text>
-    <view wx:for="{{players}}" wx:for-index="idx" wx:for-item="name" wx:key="idx" style="margin-bottom:8px; display:flex; align-items:center;">
-      <input placeholder="请输入球员姓名" value="{{name}}" data-idx="{{idx}}" bindinput="updatePlayerName" style="flex:1;" disabled="{{signupLocked || signed[idx]}}" />
-      <button size="mini" data-idx="{{idx}}" bindtap="signupPlayer" style="margin-left:8px;" disabled="{{signupLocked || signed[idx]}}">报名</button>
+    <view wx:for="{{players}}" wx:for-index="idx" wx:for-item="player" wx:key="idx" style="margin-bottom:8px; display:flex; align-items:center;">
+      <input placeholder="请输入球员姓名" value="{{player.name}}" data-idx="{{idx}}" bindinput="updatePlayerName" style="flex:1;" disabled="{{signupLocked || player.signed}}" />
+      <radio-group bindchange="onGenderChange" data-index="{{idx}}" style="margin-left:8px; display: flex; align-items: center;">
+        <label style="margin-right: 8px;">
+          <radio value="male" checked="{{player.gender === 'male' || !player.gender}}" /> 男
+        </label>
+        <label>
+          <radio value="female" checked="{{player.gender === 'female'}}" /> 女
+        </label>
+      </radio-group>
+      <button size="mini" data-idx="{{idx}}" bindtap="signupPlayer" style="margin-left:8px;" disabled="{{signupLocked || player.signed}}">报名</button>
     </view>
   </view>
   <button bindtap="confirmSignup" disabled="{{!canSignup || signupLocked}}">完成报名</button>

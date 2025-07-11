@@ -11,21 +11,54 @@ Page({
   onLoad: function () {
     const app = getApp()
     const schedule = app.globalData.schedule || []
-    console.log('schedule:', schedule)
-    // 保证 scores 结构和 schedule 完全一致
-    const scores = schedule.map(round =>
-      Array.isArray(round)
-        ? round.map(() => ({ left: 0, right: 0 }))
-        : []
-    )
-    this.setData({ schedule, scores }, () => { this.updateRanking() })
-
-    const savedScores = wx.getStorageSync('match_scores')
-    if (savedScores) {
-      this.setData({ scores: savedScores }, () => {
-        this.updateRanking()
+    const players = app.globalData.players || []
+    
+    // 处理新的数据结构：从 player 对象中提取性别信息
+    let playerGenders = {}
+    
+    if (players.length > 0 && typeof players[0] === 'object' && players[0].name !== undefined) {
+      // 新格式：players 是对象数组
+      players.forEach(player => {
+        if (player && player.name && player.name.trim()) {
+          playerGenders[player.name.trim()] = player.gender || 'male'
+        }
       })
+    } else {
+      // 旧格式兼容：尝试从全局 genders 获取
+      const genders = app.globalData.genders || {}
+      if (Array.isArray(players) && typeof genders === 'object') {
+        // 检查 genders 是否为索引格式
+        const hasNumericKeys = Object.keys(genders).some(key => !isNaN(key))
+        
+        if (hasNumericKeys) {
+          // 转换索引格式为姓名格式
+          players.forEach((player, index) => {
+            if (player && player.trim) {
+              playerGenders[player.trim()] = genders[index] || 'male'
+            }
+          })
+        } else {
+          // 已经是姓名格式
+          playerGenders = genders
+        }
+      }
     }
+    
+    // 初始化分数数据
+    const scores = schedule.map(round => 
+      round.map(() => ({ left: 0, right: 0 }))
+    )
+    
+    this.setData({ 
+      schedule, 
+      scores, 
+      genders: playerGenders,
+      scoreRange: Array.from({ length: 31 }, (_, i) => i)
+    })
+    
+    // 保存转换后的性别数据
+    app.globalData.genders = playerGenders
+    wx.setStorageSync('match_genders_by_name', playerGenders)
   },
   pickerScore(e) {
     const { round, court, side } = e.currentTarget.dataset

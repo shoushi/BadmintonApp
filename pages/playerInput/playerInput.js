@@ -63,12 +63,36 @@ Page({
   generateMatches() {
     const players = app.globalData.players || []
     const { roundCount } = this.data
-    if (players.length < 4) {
+    
+    // 处理新的数据结构：从 player 对象中提取姓名和性别
+    let playerNames = []
+    let playerGenders = {}
+    
+    if (players.length > 0 && typeof players[0] === 'object' && players[0].name !== undefined) {
+      // 新格式：players 是对象数组
+      playerNames = players.filter(p => p && p.name && p.name.trim()).map(p => p.name.trim())
+      players.forEach(p => {
+        if (p && p.name && p.name.trim()) {
+          playerGenders[p.name.trim()] = p.gender || 'male'
+        }
+      })
+    } else {
+      // 旧格式：players 是字符串数组
+      playerNames = players.filter(name => name && name.trim())
+      const genders = app.globalData.genders || {}
+      playerNames.forEach(name => {
+        playerGenders[name] = genders[name] || 'male'
+      })
+    }
+    
+    if (playerNames.length < 4) {
       wx.showToast({ title: '请先报名4名及以上球员', icon: 'none' })
       return
     }
-    const schedule = badmintonSchedule(players, 3, 4, 6, roundCount)
+    
+    const schedule = badmintonSchedule(playerNames, playerGenders, 3, 4, 6, roundCount)
     app.globalData.schedule = schedule
+    app.globalData.genders = playerGenders
     wx.navigateTo({
       url: '../matchTable/matchTable',
     })
