@@ -1,0 +1,25 @@
+<!-- 底部操作区 -->
+<view class="bottom-actions">
+  <!-- 状态提示 -->
+  <view wx:if="{{signupLocked}}" class="lock-notice">
+    <view class="lock-icon">🔒</view>
+    <view class="lock-text">报名已锁定，无法修改</view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button 
+      class="complete-btn {{canSignup && !signupLocked ? 'enabled' : 'disabled'}}"
+      bindtap="confirmSignup" 
+      disabled="{{!canSignup || signupLocked}}"
+    >
+      <text class="btn-icon">🎯</text>
+      <text class="btn-text">完成报名并生成对阵</text>
+    </button>
+    
+    <view wx:if="{{!canSignup && !signupLocked}}" class="tips">
+      <text class="tip-icon">💡</text>
+      <text class="tip-text">请至少完成{{minRequired}}名球员的报名（填写姓名并选择性别）</text>
+    </view>
+  </view>
+</view>

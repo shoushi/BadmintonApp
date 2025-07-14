@@ -1,20 +1,135 @@
 <!--index.wxml-->
-<view class="container" style="padding:32px 16px;">
-  <view class="title" style="font-size:28px;font-weight:bold;text-align:center;margin-bottom:32px;color:#007aff;">
-    羽毛球比赛助手
+<view class="container">
+  <!-- 顶部横幅区域 -->
+  <view class="header-banner">
+    <view class="header-bg">
+      <image class="bg-pattern" src="/images/badminton-pattern.png" mode="aspectFill"></image>
+    </view>
+    <view class="header-content">
+      <view class="app-icon">🏸</view>
+      <view class="app-title">羽毛球比赛助手</view>
+      <view class="app-subtitle">智能分组 · 公平竞技 · 数据统计</view>
+    </view>
   </view>
-  <view style="display:flex;flex-direction:column;gap:20px;align-items:center;">
-    <button class="main-btn" style="background:#34c759;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToPlayerInput">
-      <image src="/images/create.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 创建比赛
-    </button>
-    <button class="main-btn" style="background:#007aff;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToSignup">
-      <image src="/images/signup.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 球员报名
-    </button>
-    <button class="main-btn" style="background:#ff9500;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToMatchTable">
-      <image src="/images/match.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 对战信息
-    </button>
-    <button class="main-btn" style="background:#5856d6;color:#fff;font-size:18px;height:48px;border-radius:8px;width:90%;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;" bindtap="navigateToRanking">
-      <image src="/images/ranking.png" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" /> 得分排名
-    </button>
+
+  <!-- 快速状态卡片 -->
+  <view class="status-cards">
+    <view class="status-card">
+      <view class="card-icon">👥</view>
+      <view class="card-title">参赛人数</view>
+      <view class="card-value">{{playerCount || 8}}人</view>
+    </view>
+    <view class="status-card">
+      <view class="card-icon">🏟️</view>
+      <view class="card-title">比赛场地</view>
+      <view class="card-value">{{courtCount || 2}}片</view>
+    </view>
+    <view class="status-card">
+      <view class="card-icon">⏱️</view>
+      <view class="card-title">轮次设置</view>
+      <view class="card-value">{{roundCount || 4}}轮</view>
+    </view>
+  </view>
+
+  <!-- 主要功能区域 -->
+  <view class="main-actions">
+    <view class="section-title">
+      <text class="title-icon">⚡</text>
+      <text class="title-text">快速开始</text>
+    </view>
+    
+    <!-- 核心功能按钮 -->
+    <view class="action-grid">
+      <view class="action-item primary" bindtap="navigateToSetup">
+        <view class="action-icon">⚙️</view>
+        <view class="action-content">
+          <view class="action-title">比赛设置</view>
+          <view class="action-desc">设置人数、场地、轮次</view>
+        </view>
+        <view class="action-arrow">›</view>
+      </view>
+
+      <view class="action-item success" bindtap="navigateToSignup" wx:if="{{playerCount}}">
+        <view class="action-icon">📝</view>
+        <view class="action-content">
+          <view class="action-title">球员报名</view>
+          <view class="action-desc">录入球员姓名和性别</view>
+        </view>
+        <view class="action-arrow">›</view>
+      </view>
+
+      <view class="action-item warning" bindtap="navigateToMatchTable" wx:if="{{hasSchedule}}">
+        <view class="action-icon">🏆</view>
+        <view class="action-content">
+          <view class="action-title">比赛进行</view>
+          <view class="action-desc">录入比分，查看对阵</view>
+        </view>
+        <view class="action-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 比赛状态概览 -->
+  <view class="match-overview" wx:if="{{hasSchedule}}">
+    <view class="section-title">
+      <text class="title-icon">📊</text>
+      <text class="title-text">比赛概况</text>
+    </view>
+    
+    <view class="overview-cards">
+      <view class="overview-item">
+        <view class="overview-number">{{totalRounds}}</view>
+        <view class="overview-label">总轮次</view>
+      </view>
+      <view class="overview-item">
+        <view class="overview-number">{{totalMatches}}</view>
+        <view class="overview-label">总比赛</view>
+      </view>
+      <view class="overview-item">
+        <view class="overview-number">{{completedMatches}}</view>
+        <view class="overview-label">已完成</view>
+      </view>
+      <view class="overview-item">
+        <view class="overview-number">{{progressPercent}}%</view>
+        <view class="overview-label">进度</view>
+      </view>
+    </view>
+
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+    </view>
+  </view>
+
+  <!-- 快捷工具区域 -->
+  <view class="tools-section">
+    <view class="section-title">
+      <text class="title-icon">🛠️</text>
+      <text class="title-text">快捷工具</text>
+    </view>
+    
+    <view class="tools-grid">
+      <view class="tool-item" bindtap="navigateToRanking" wx:if="{{hasSchedule}}">
+        <view class="tool-icon">🏅</view>
+        <view class="tool-name">排行榜</view>
+      </view>
+      <view class="tool-item" bindtap="exportData" wx:if="{{hasSchedule}}">
+        <view class="tool-icon">📤</view>
+        <view class="tool-name">导出数据</view>
+      </view>
+      <view class="tool-item" bindtap="resetMatch">
+        <view class="tool-icon">🔄</view>
+        <view class="tool-name">重置比赛</view>
+      </view>
+      <view class="tool-item" bindtap="showHelp">
+        <view class="tool-icon">❓</view>
+        <view class="tool-name">使用帮助</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="footer-info">
+    <text class="version-text">羽毛球比赛助手 v2.1</text>
+    <text class="copyright-text">智能分组算法 · 公平竞技体验</text>
   </view>
 </view>

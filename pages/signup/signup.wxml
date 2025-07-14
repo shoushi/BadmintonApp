@@ -1,23 +1,103 @@
-<view class="container">
-  <view class="title">球员报名</view>
-  <view style="margin-bottom:16px;">
-    <text>球员人数：{{playerCount}}</text>
-  </view>
-  <view style="margin-bottom:16px;">
-    <text>球员名单：</text>
-    <view wx:for="{{players}}" wx:for-index="idx" wx:for-item="player" wx:key="idx" style="margin-bottom:8px; display:flex; align-items:center;">
-      <input placeholder="请输入球员姓名" value="{{player.name}}" data-idx="{{idx}}" bindinput="updatePlayerName" style="flex:1;" disabled="{{signupLocked || player.signed}}" />
-      <radio-group bindchange="onGenderChange" data-index="{{idx}}" style="margin-left:8px; display: flex; align-items: center;">
-        <label style="margin-right: 8px;">
-          <radio value="male" checked="{{player.gender === 'male' || !player.gender}}" /> 男
-        </label>
-        <label>
-          <radio value="female" checked="{{player.gender === 'female'}}" /> 女
-        </label>
-      </radio-group>
-      <button size="mini" data-idx="{{idx}}" bindtap="signupPlayer" style="margin-left:8px;" disabled="{{signupLocked || player.signed}}">报名</button>
+<view class="signup-container">
+  <!-- 页面头部 -->
+  <include src="./components/header.wxml" />
+  
+  <!-- 统计卡片 -->
+  <include src="./components/stats.wxml" />
+  
+  <!-- 进度条 -->
+  <include src="./components/progress.wxml" />
+
+  <!-- 球员列表 -->
+  <view class="players-section">
+    <view class="section-title">
+      <text class="title-icon">📝</text>
+      <text class="title-text">球员信息</text>
+    </view>
+
+    <view class="players-grid">
+      <view wx:for="{{players}}" 
+            wx:for-index="idx" 
+            wx:for-item="player" 
+            wx:key="idx" 
+            class="player-card {{player.signed ? 'signed' : ''}}"
+            data-idx="{{idx}}">
+        
+        <template is="player-item" data="{{player, idx, signupLocked}}" />
+      </view>
     </view>
   </view>
-  <button bindtap="confirmSignup" disabled="{{!canSignup || signupLocked}}">完成报名</button>
-  <view wx:if="{{signupLocked}}" style="color: #888; margin-top: 16px;">报名已锁定，无法修改</view>
+  <!-- 底部操作区 -->
+  <include src="./components/bottom-actions.wxml" />
 </view>
+
+<!-- 球员卡片模板 -->
+<template name="player-item">
+  <!-- 球员编号 -->
+  <view class="player-number {{player.signed ? 'signed' : ''}}">
+    <text wx:if="{{!player.signed}}">{{idx + 1}}</text>
+    <text wx:else class="check-icon">✓</text>
+  </view>
+
+  <!-- 球员信息 -->
+  <view class="player-info">
+    <template is="player-name-input" data="{{player, idx, signupLocked}}" />
+    <template is="player-gender-select" data="{{player, idx, signupLocked}}" />
+  <!-- 报名按钮 -->
+  <template is="signup-button" data="{{player, idx, signupLocked}}" /> 
+  </view>
+</template>
+
+<!-- 姓名输入模板 -->
+<template name="player-name-input">
+  <view class="input-group">
+    <view class="input-label">姓名</view>
+    <input 
+      class="player-input {{player.signed ? 'disabled' : ''}}" 
+      placeholder="请输入球员姓名" 
+      value="{{player.name}}" 
+      data-idx="{{idx}}" 
+      bindinput="updatePlayerName" 
+      disabled="{{signupLocked || player.signed}}" 
+    />
+  </view>
+</template>
+
+<!-- 性别选择模板 -->
+<template name="player-gender-select">
+  <view class="gender-group">
+    <radio-group bindchange="onGenderChange" data-index="{{idx}}" class="gender-radios">
+      <label class="gender-option {{player.gender === 'male' ? 'selected' : ''}}" data-index="{{idx}}">
+        <radio value="male" checked="{{player.gender === 'male'}}" disabled="{{signupLocked || player.signed}}" />
+        <view class="gender-text">
+          <text class="gender-icon">👨</text>
+          <text>男</text>
+        </view>
+      </label>
+      <label class="gender-option {{player.gender === 'female' ? 'selected' : ''}}" data-index="{{idx}}">
+        <radio value="female" checked="{{player.gender === 'female'}}" disabled="{{signupLocked || player.signed}}" />
+        <view class="gender-text">
+          <text class="gender-icon">�</text>
+          <text>女</text>
+        </view>
+      </label>
+    </radio-group>
+  </view>
+</template>
+
+<!-- 报名按钮模板 -->
+<template name="signup-button">
+  <view class="player-action">
+    <button 
+      class="signup-btn {{(signupLocked || player.signed) ? 'disabled' : 'ready'}}"
+      data-idx="{{idx}}" 
+      bindtap="signupPlayer" 
+      disabled="{{signupLocked || player.signed}}"
+    >
+      <text wx:if="{{!player.signed}}">
+        {{signupLocked ? '已锁定' : '报名'}}
+      </text>
+      <text wx:else>✓ 已报名</text>
+    </button>
+  </view>
+</template>

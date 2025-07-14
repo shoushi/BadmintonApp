@@ -1,0 +1,19 @@
+<!-- 状态统计卡片 -->
+<view class="stats-section">
+  <view class="stats-card">
+    <view class="stat-item">
+      <view class="stat-number">{{playerCount}}</view>
+      <view class="stat-label">总人数</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-number">{{filledCount}}</view>
+      <view class="stat-label">已填写</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-number">{{signedCount}}</view>
+      <view class="stat-label">已报名</view>
+    </view>
+  </view>
+</view>

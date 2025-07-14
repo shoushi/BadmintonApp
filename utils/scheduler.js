@@ -59,17 +59,24 @@ function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPe
   const availableMales = availablePlayers.filter(p => genders[p] === 'male');
   const availableFemales = availablePlayers.filter(p => genders[p] === 'female');
   
-  // 第一优先级：真正的混双分组（1男1女 vs 1男1女）
+  console.log(`🔍 可用球员统计: 男${availableMales.length}人, 女${availableFemales.length}人`);
+  
+  // 🏆 第一优先级：真混双 (1男1女 vs 1男1女) - 最优先
   if (availableMales.length >= 2 && availableFemales.length >= 2) {
+    console.log(`🏆 尝试生成真混双分组...`);
     const mixedGroup = generateMixedDoubleGroup(availableMales, availableFemales, partners, partnerCounts);
     if (mixedGroup) {
+      console.log(`✅ 真混双分组成功: ${mixedGroup.map(p => `${p}${genders[p] === 'male' ? '♂' : '♀'}`).join(', ')}`);
       return mixedGroup;
     }
   }
 
-  // 第二优先级：同性组合（4男0女、0男4女）
-  // 尝试4男组合
+  // 🥈 第二优先级：同性别双打 (男双 vs 男双 或 女双 vs 女双) - 次优先
+  console.log(`🥈 尝试生成同性别双打分组...`);
+  
+  // 尝试男双 vs 男双 (4男0女)
   if (availableMales.length >= 4) {
+    console.log(`👨 尝试4男分组...`);
     for (let i = 0; i < availableMales.length; i++) {
       let a = availableMales[i];
       for (let j = i + 1; j < availableMales.length; j++) {
@@ -80,6 +87,7 @@ function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPe
             let d = availableMales[l];
             let group = [a, b, c, d];
             if (isValidGroup(group, partners, partnerCounts)) {
+              console.log(`✅ 男双分组成功: ${group.map(p => `${p}♂`).join(', ')}`);
               return group;
             }
           }
@@ -88,8 +96,9 @@ function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPe
     }
   }
   
-  // 尝试4女组合
+  // 尝试女双 vs 女双 (0男4女)
   if (availableFemales.length >= 4) {
+    console.log(`👩 尝试4女分组...`);
     for (let i = 0; i < availableFemales.length; i++) {
       let a = availableFemales[i];
       for (let j = i + 1; j < availableFemales.length; j++) {
@@ -100,6 +109,7 @@ function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPe
             let d = availableFemales[l];
             let group = [a, b, c, d];
             if (isValidGroup(group, partners, partnerCounts)) {
+              console.log(`✅ 女双分组成功: ${group.map(p => `${p}♀`).join(', ')}`);
               return group;
             }
           }
@@ -108,29 +118,18 @@ function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPe
     }
   }
 
-  // 第三优先级：其他可接受的性别组合
-  for (let i = 0; i < sorted.length; i++) {
-    let a = sorted[i];
-    if (used.has(a) || isPlayedLastThree(recentPlays[a]) || playCount[a] >= maxGamesPerPlayer) continue;
-    for (let j = i + 1; j < sorted.length; j++) {
-      let b = sorted[j];
-      if (used.has(b) || isPlayedLastThree(recentPlays[b]) || playCount[b] >= maxGamesPerPlayer) continue;
-      for (let k = j + 1; k < sorted.length; k++) {
-        let c = sorted[k];
-        if (used.has(c) || isPlayedLastThree(recentPlays[c]) || playCount[c] >= maxGamesPerPlayer) continue;
-        for (let l = k + 1; l < sorted.length; l++) {
-          let d = sorted[l];
-          if (used.has(d) || isPlayedLastThree(recentPlays[d]) || playCount[d] >= maxGamesPerPlayer) continue;
-          let group = [a, b, c, d];
-          if (isValidGroup(group, partners, partnerCounts) && isGenderBalanced(group, genders)) {
-            return group;
-          }
-        }
-      }
+  // 🥉 第三优先级：男双 vs 女双 (2男2女，但非真混双) - 次次优先
+  if (availableMales.length >= 2 && availableFemales.length >= 2) {
+    console.log(`🥉 尝试生成男双vs女双分组...`);
+    const maleVsFemaleGroup = generateMaleVsFemaleGroup(availableMales, availableFemales, partners, partnerCounts);
+    if (maleVsFemaleGroup) {
+      console.log(`✅ 男双vs女双分组成功: ${maleVsFemaleGroup.map(p => `${p}${genders[p] === 'male' ? '♂' : '♀'}`).join(', ')}`);
+      return maleVsFemaleGroup;
     }
   }
 
-  // 第四优先级：仅考虑搭档次数限制（最后的兜底方案）
+  // 🆘 兜底方案：忽略性别限制，仅考虑搭档次数和出场次数
+  console.log(`🆘 使用兜底方案，忽略性别限制...`);
   for (let i = 0; i < sorted.length; i++) {
     let a = sorted[i];
     if (used.has(a) || isPlayedLastThree(recentPlays[a]) || playCount[a] >= maxGamesPerPlayer) continue;
@@ -145,12 +144,15 @@ function selectGroup(players, partners, used, recentPlays, playCount, maxGamesPe
           if (used.has(d) || isPlayedLastThree(recentPlays[d]) || playCount[d] >= maxGamesPerPlayer) continue;
           let group = [a, b, c, d];
           if (isValidGroup(group, partners, partnerCounts)) {
+            console.log(`⚠️ 兜底分组成功: ${group.map(p => `${p}${genders[p] === 'male' ? '♂' : '♀'}`).join(', ')}`);
             return group;
           }
         }
       }
     }
   }
+  
+  console.log(`❌ 无法生成任何有效分组`);
   return null;
 }
 
@@ -226,6 +228,26 @@ function generateMixedDoubleGroup(availableMales, availableFemales, partners, pa
   return null;
 }
 
+// 生成男双vs女双分组 (第三优先级)
+function generateMaleVsFemaleGroup(availableMales, availableFemales, partners, partnerCounts) {
+  // 尝试不同的男双+女双组合
+  for (let i = 0; i < availableMales.length; i++) {
+    for (let j = i + 1; j < availableMales.length; j++) {
+      for (let k = 0; k < availableFemales.length; k++) {
+        for (let l = k + 1; l < availableFemales.length; l++) {
+          // 男双 vs 女双: (男i,男j) vs (女k,女l)
+          const group = [availableMales[i], availableMales[j], availableFemales[k], availableFemales[l]];
+          if (isValidGroup(group, partners, partnerCounts)) {
+            console.log(`🔄 生成男双vs女双: (${availableMales[i]}♂+${availableMales[j]}♂) vs (${availableFemales[k]}♀+${availableFemales[l]}♀)`);
+            return group;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
 function badmintonSchedule(players, genders, courtCount = 3, groupSize = 4, maxGamesPerPlayer = 6, maxRounds = 9) {
   const partners = {};
   const recentPlays = {};
@@ -234,6 +256,15 @@ function badmintonSchedule(players, genders, courtCount = 3, groupSize = 4, maxG
   
   // 日志记录功能
   const logs = [];
+  
+  // 🏆 分组类型统计
+  const groupTypeStats = {
+    trueMixed: 0,      // 🏆 真混双 (1男1女 vs 1男1女)
+    malePairs: 0,      // 🥈 男双对战 (4男0女)
+    femalePairs: 0,    // 🥈 女双对战 (0男4女)
+    maleVsFemale: 0,   // 🥉 男双vs女双 (2男2女但非混双)
+    other: 0           // 🆘 其他组合 (兜底方案)
+  };
   
   function logPlayCount(round, action = '') {
     const logEntry = {
@@ -258,6 +289,31 @@ function badmintonSchedule(players, genders, courtCount = 3, groupSize = 4, maxG
     const maxCount = Math.max(...counts);
     const avgCount = (counts.reduce((a, b) => a + b, 0) / counts.length).toFixed(1);
     console.log(`📊 统计: 最少${minCount}次, 最多${maxCount}次, 平均${avgCount}次, 差距${maxCount - minCount}次`);
+  }
+  
+  // 分析分组类型并更新统计
+  function analyzeGroupType(group, genders) {
+    const maleCount = group.filter(p => genders[p] === 'male').length;
+    const femaleCount = group.filter(p => genders[p] === 'female').length;
+    
+    if (maleCount === 2 && femaleCount === 2) {
+      if (isTrueMixedDouble(group, genders)) {
+        groupTypeStats.trueMixed++;
+        return '🏆 真混双';
+      } else {
+        groupTypeStats.maleVsFemale++;
+        return '🥉 男双vs女双';
+      }
+    } else if (maleCount === 4 && femaleCount === 0) {
+      groupTypeStats.malePairs++;
+      return '🥈 男双对战';
+    } else if (maleCount === 0 && femaleCount === 4) {
+      groupTypeStats.femalePairs++;
+      return '🥈 女双对战';
+    } else {
+      groupTypeStats.other++;
+      return '🆘 其他组合';
+    }
   }
   
   players.forEach(p => {
@@ -329,28 +385,9 @@ function badmintonSchedule(players, genders, courtCount = 3, groupSize = 4, maxG
       // 输出本轮分组详情
       console.log(`\n🏟️ 第${round + 1}轮分组 (使用${roundGroups.length}/${courtCount}片场地):`);
       roundGroups.forEach((group, index) => {
-        const maleCount = group.filter(p => genders[p] === 'male').length;
-        const femaleCount = group.filter(p => genders[p] === 'female').length;
-        let genderDisplay = '';
-        
-        if (maleCount === 2 && femaleCount === 2) {
-          // 检查是否为真正的混双
-          if (isTrueMixedDouble(group, genders)) {
-            const males = group.filter(p => genders[p] === 'male');
-            const females = group.filter(p => genders[p] === 'female');
-            genderDisplay = `真混双 (${males[0]}♂+${females[0]}♀ vs ${males[1]}♂+${females[1]}♀)`;
-          } else {
-            genderDisplay = '男双vs女双 (2男2女但非混双)';
-          }
-        } else if (maleCount === 4) {
-          genderDisplay = '男双对战';
-        } else if (femaleCount === 4) {
-          genderDisplay = '女双对战';
-        } else {
-          genderDisplay = '其他组合';
-        }
-        
-        console.log(`  场地${index + 1}: [${group.join(', ')}] - ${genderDisplay}`);
+        const groupType = analyzeGroupType(group, genders);
+        const playerDisplay = group.map(p => `${p}${genders[p] === 'male' ? '♂' : genders[p] === 'female' ? '♀' : ''}`).join(', ');
+        console.log(`  场地${index + 1}: [${playerDisplay}] - ${groupType}`);
       });
     } else {
       break;
@@ -593,11 +630,12 @@ function badmintonSchedule(players, genders, courtCount = 3, groupSize = 4, maxG
     });
   });
   
-  console.log(`\n🎯 性别分组统计:`);
-  console.log(`  真混双(1男1女vs1男1女): ${trueMixedCount}场`);
-  console.log(`  男双vs女双(2男2女): ${fakeMixedCount}场`);
-  console.log(`  男双对战(4男0女): ${maleOnlyCount}场`);
-  console.log(`  女双对战(0男4女): ${femaleOnlyCount}场`);
+  console.log(`\n🎯 分组类型优化统计 (根据README优先级):`);
+  console.log(`  🏆 真混双(1男1女vs1男1女): ${groupTypeStats.trueMixed}场 - 最优先`);
+  console.log(`  🥈 男双对战(4男0女): ${groupTypeStats.malePairs}场 - 次优先`);
+  console.log(`  🥈 女双对战(0男4女): ${groupTypeStats.femalePairs}场 - 次优先`);
+  console.log(`  🥉 男双vs女双(2男2女): ${groupTypeStats.maleVsFemale}场 - 次次优先`);
+  console.log(`  🆘 其他组合: ${groupTypeStats.other}场 - 兜底方案`);
   
   // 将日志信息附加到结果中（可选）
   finalSchedule._logs = logs;
@@ -606,6 +644,14 @@ function badmintonSchedule(players, genders, courtCount = 3, groupSize = 4, maxG
     totalMatches: finalSchedule.reduce((total, round) => total + round.length, 0),
     playCount: {...playCount},
     fairnessGap: maxFinalCount - minFinalCount,
+    optimizedGroupStats: {
+      trueMixed: groupTypeStats.trueMixed,        // 🏆 真混双 (最优先)
+      malePairs: groupTypeStats.malePairs,        // 🥈 男双对战 (次优先)
+      femalePairs: groupTypeStats.femalePairs,    // 🥈 女双对战 (次优先)
+      maleVsFemale: groupTypeStats.maleVsFemale,  // 🥉 男双vs女双 (次次优先)
+      other: groupTypeStats.other                 // � 其他组合 (兜底方案)
+    },
+    // 保留旧的统计数据以维持兼容性
     genderStats: {
       trueMixed: trueMixedCount,    // 真混双
       fakeMixed: fakeMixedCount,    // 男双vs女双

@@ -1,0 +1,8 @@
+<!-- 顶部横幅 -->
+<view class="header-banner">
+  <view class="header-content">
+    <view class="header-icon">👥</view>
+    <view class="header-title">球员报名</view>
+    <view class="header-subtitle">录入参赛球员信息</view>
+  </view>
+</view>

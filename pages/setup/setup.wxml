@@ -1,0 +1,98 @@
+<!--setup.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="header-title">比赛设置</view>
+    <view class="header-subtitle">配置基本比赛参数</view>
+  </view>
+
+  <view class="settings-form">
+    <!-- 参赛人数设置 -->
+    <view class="setting-item">
+      <view class="setting-label">
+        <text class="label-icon">👥</text>
+        <text class="label-text">参赛人数</text>
+      </view>
+      <view class="setting-control">
+        <view class="number-input">
+          <button class="btn-decrease" bindtap="decreasePlayerCount" disabled="{{playerCount <= 4}}">-</button>
+          <input class="number-value" type="number" value="{{playerCount}}" bindinput="onPlayerCountInput" />
+          <button class="btn-increase" bindtap="increasePlayerCount" disabled="{{playerCount >= 20}}">+</button>
+        </view>
+        <text class="setting-tip">建议4-20人</text>
+      </view>
+    </view>
+
+    <!-- 场地数量设置 -->
+    <view class="setting-item">
+      <view class="setting-label">
+        <text class="label-icon">🏟️</text>
+        <text class="label-text">场地数量</text>
+      </view>
+      <view class="setting-control">
+        <view class="number-input">
+          <button class="btn-decrease" bindtap="decreaseCourtCount" disabled="{{courtCount <= 1}}">-</button>
+          <input class="number-value" type="number" value="{{courtCount}}" bindinput="onCourtCountInput" />
+          <button class="btn-increase" bindtap="increaseCourtCount" disabled="{{courtCount >= 5}}">+</button>
+        </view>
+        <text class="setting-tip">建议1-5片场地</text>
+      </view>
+    </view>
+
+    <!-- 最大轮次设置 -->
+    <view class="setting-item">
+      <view class="setting-label">
+        <text class="label-icon">⏱️</text>
+        <text class="label-text">最大轮次</text>
+      </view>
+      <view class="setting-control">
+        <view class="number-input">
+          <button class="btn-decrease" bindtap="decreaseRoundCount" disabled="{{roundCount <= 3}}">-</button>
+          <input class="number-value" type="number" value="{{roundCount}}" bindinput="onRoundCountInput" />
+          <button class="btn-increase" bindtap="increaseRoundCount" disabled="{{roundCount >= 10}}">+</button>
+        </view>
+        <text class="setting-tip">建议3-10轮</text>
+      </view>
+    </view>
+
+    <!-- 每人最大比赛场次 -->
+    <view class="setting-item">
+      <view class="setting-label">
+        <text class="label-icon">🎯</text>
+        <text class="label-text">每人最大场次</text>
+      </view>
+      <view class="setting-control">
+        <view class="number-input">
+          <button class="btn-decrease" bindtap="decreaseMaxGames" disabled="{{maxGamesPerPlayer <= 3}}">-</button>
+          <input class="number-value" type="number" value="{{maxGamesPerPlayer}}" bindinput="onMaxGamesInput" />
+          <button class="btn-increase" bindtap="increaseMaxGames" disabled="{{maxGamesPerPlayer >= 10}}">+</button>
+        </view>
+        <text class="setting-tip">建议3-10场</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预计比赛信息 -->
+  <view class="preview-info">
+    <view class="preview-title">预计比赛信息</view>
+    <view class="preview-cards">
+      <view class="preview-item">
+        <view class="preview-number">{{estimatedRounds}}</view>
+        <view class="preview-label">预计轮次</view>
+      </view>
+      <view class="preview-item">
+        <view class="preview-number">{{estimatedMatches}}</view>
+        <view class="preview-label">预计总场次</view>
+      </view>
+      <view class="preview-item">
+        <view class="preview-number">{{estimatedTime}}</view>
+        <view class="preview-label">预计用时(分钟)</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button class="btn-save" bindtap="saveSettings">保存设置</button>
+    <button class="btn-reset" bindtap="resetSettings">重置默认</button>
+  </view>
+</view>

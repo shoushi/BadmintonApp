@@ -1,39 +1,161 @@
 <!--matchTable.wxml-->
-<view class="container" style="padding: 16px; background-color: #f9f9f9;">
-  <view class="title" style="font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 16px;">比赛对阵表</view>
-  <view class="match-table">
-    <view wx:for="{{schedule}}" wx:for-index="index" wx:for-item="item" wx:key="round">
-      <view style="margin-top:16px; font-weight:bold; background:#e6f7ff; padding:8px 12px; border-radius:4px; color:#0050b3;">第{{index+1}}轮</view>
-      <view wx:for="{{item}}" wx:for-index="idx" wx:for-item="court" wx:key="court" style="margin-bottom:12px;">
-        <view style="display:flex; align-items:center; padding: 8px; background: #ffffff; border: 1px solid #d9d9d9; border-radius: 4px; flex-wrap: nowrap;">
-          <text style="font-weight:bold; width:80px; color:#595959;">场地{{idx+1}}</text>
-          <text style="flex:1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            【<text style="color:{{genders[court[0]] === 'male' ? 'blue' : 'red'}}; font-weight: bold;">{{court[0]}}</text><text>,</text><text style="color:{{genders[court[1]] === 'male' ? 'blue' : 'red'}}; font-weight: bold;">{{court[1]}}</text><text style="color:#1aad19; font-weight: bold;"> VS </text><text style="color:{{genders[court[2]] === 'male' ? 'blue' : 'red'}}; font-weight: bold;">{{court[2]}}</text><text>,</text><text style="color:{{genders[court[3]] === 'male' ? 'blue' : 'red'}}; font-weight: bold;">{{court[3]}}</text>】
-          </text>
-        </view>
-        <view style="margin:4px 0 0 60px; display:flex; align-items:center;">
-          <picker mode="selector" range="{{scoreRange}}" 
-            value="{{scoreRange.indexOf(scores[index][idx].left)}}" 
-            data-round="{{index}}" data-court="{{idx}}" data-side="left" 
-            bindchange="pickerScore">
-            <view class="picker" style="width:50px; text-align:center; background:#fff; border:1px solid #d9d9d9; border-radius:4px;">
-              {{scores[index][idx].left}}
+<view class="match-container">
+  <!-- 页面头部 -->
+  <view class="header-section">
+    <view class="header-icon">🏸</view>
+    <view class="header-title">比赛对阵表</view>
+    <view class="header-subtitle">羽毛球赛程安排</view>
+    <view class="header-actions">
+      <button class="action-btn clear-all-btn" bindtap="onClearAllMatches">清空所有数据</button>
+    </view>
+  </view>
+
+  <!-- 比赛统计卡片 -->
+  <view class="stats-cards">
+    <view class="stat-card">
+      <view class="stat-number">{{schedule.length}}</view>
+      <view class="stat-label">轮次</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-number">{{totalMatches}}</view>
+      <view class="stat-label">总场次</view>
+    </view>
+    <view class="stat-card completed">
+      <view class="stat-number">{{completedMatches}}</view>
+      <view class="stat-label">已完成</view>
+    </view>
+    <view class="stat-card progress">
+      <view class="stat-number">{{Math.round(completedMatches / totalMatches * 100)}}%</view>
+      <view class="stat-label">进度</view>
+    </view>
+  </view>
+  <!-- 比赛轮次列表 -->
+  <view class="rounds-section">
+    <view wx:for="{{schedule}}" wx:for-index="roundIndex" wx:for-item="round" wx:key="round" class="round-container">
+      
+      <!-- 轮次标题 -->
+      <view class="round-header">
+        <view class="round-icon">⚡</view>
+        <view class="round-title">第 {{roundIndex + 1}} 轮</view>
+        <view class="round-matches">{{round.length}} 场比赛</view>
+      </view>
+
+      <!-- 该轮次的比赛列表 -->
+      <view class="matches-list">
+        <view wx:for="{{round}}" wx:for-index="courtIndex" wx:for-item="match" wx:key="court" class="match-card {{isMatchFinished(roundIndex, courtIndex) ? 'finished' : ''}}">
+          
+          <!-- 比赛信息头部 -->
+          <view class="match-header">
+            <view class="court-info">
+              <view class="court-icon">🏟️</view>
+              <view class="court-name">场地 {{courtIndex + 1}}</view>
             </view>
-          </picker>
-          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="left" bindtap="addScore" style="margin:0 4px; background:#e6f7ff; color:#0050b3; border:none;" wx:if="{{scores[index][idx].left >= 21}}">+</button>
-          <text style="margin:0 8px; font-weight:bold; color:#595959;"> : </text>
-          <picker mode="selector" range="{{scoreRange}}" 
-            value="{{scoreRange.indexOf(scores[index][idx].right)}}" 
-            data-round="{{index}}" data-court="{{idx}}" data-side="right" 
-            bindchange="pickerScore">
-            <view class="picker" style="width:50px; text-align:center; background:#fff; border:1px solid #d9d9d9; border-radius:4px;">
-              {{scores[index][idx].right}}
+            <view class="match-status {{getMatchStatus(roundIndex, courtIndex)}}">
+              {{getMatchStatusText(roundIndex, courtIndex)}}
             </view>
-          </picker>
-          <button size="mini" data-round="{{index}}" data-court="{{idx}}" data-side="right" bindtap="addScore" style="margin-left:4px; background:#e6f7ff; color:#0050b3; border:none;" wx:if="{{scores[index][idx].right >= 21}}">+</button>
+          </view>
+
+          <!-- 对阵双方 -->
+          <view class="teams-container">
+            <!-- 左侧队伍 -->
+            <view class="team left-team">
+              <view class="team-label">A队</view>
+              <view class="players">
+                <view class="player {{getPlayerGenderClass(match[0])}}">
+                  <view class="player-icon">{{getPlayerIcon(match[0])}}</view>
+                  <view class="player-name">{{match[0]}}</view>
+                </view>
+                <view class="player {{getPlayerGenderClass(match[1])}}">
+                  <view class="player-icon">{{getPlayerIcon(match[1])}}</view>
+                  <view class="player-name">{{match[1]}}</view>
+                </view>
+              </view>
+            </view>
+
+            <!-- VS 分隔符 -->
+            <view class="vs-section">
+              <view class="vs-icon">⚔️</view>
+              <view class="vs-text">VS</view>
+            </view>
+
+            <!-- 右侧队伍 -->
+            <view class="team right-team">
+              <view class="team-label">B队</view>
+              <view class="players">
+                <view class="player {{getPlayerGenderClass(match[2])}}">
+                  <view class="player-icon">{{getPlayerIcon(match[2])}}</view>
+                  <view class="player-name">{{match[2]}}</view>
+                </view>
+                <view class="player {{getPlayerGenderClass(match[3])}}">
+                  <view class="player-icon">{{getPlayerIcon(match[3])}}</view>
+                  <view class="player-name">{{match[3]}}</view>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 比分区域 -->
+          <view class="score-section">
+            <view class="score-container">
+              <!-- 左队比分 -->
+              <view class="score-input-group">
+                <picker mode="selector" 
+                        range="{{scoreRange}}" 
+                        value="{{scoreRange.indexOf(scores[roundIndex][courtIndex].left)}}" 
+                        data-round="{{roundIndex}}" 
+                        data-court="{{courtIndex}}" 
+                        data-side="left" 
+                        bindchange="pickerScore"
+                        disabled="{{isMatchFinished(roundIndex, courtIndex)}}"
+                        class="score-picker {{isMatchFinished(roundIndex, courtIndex) ? 'disabled' : ''}}">
+                  <view class="score-display {{getScoreDisplayClass(roundIndex, courtIndex, 'left')}}">
+                    {{scores[roundIndex][courtIndex].left}}
+                  </view>
+                </picker>
+              </view>
+
+              <!-- 比分分隔符 -->
+              <view class="score-separator">:</view>
+
+              <!-- 右队比分 -->
+              <view class="score-input-group">
+                <picker mode="selector" 
+                        range="{{scoreRange}}" 
+                        value="{{scoreRange.indexOf(scores[roundIndex][courtIndex].right)}}" 
+                        data-round="{{roundIndex}}" 
+                        data-court="{{courtIndex}}" 
+                        data-side="right" 
+                        bindchange="pickerScore"
+                        disabled="{{isMatchFinished(roundIndex, courtIndex)}}"
+                        class="score-picker {{isMatchFinished(roundIndex, courtIndex) ? 'disabled' : ''}}">
+                  <view class="score-display {{getScoreDisplayClass(roundIndex, courtIndex, 'right')}}">
+                    {{scores[roundIndex][courtIndex].right}}
+                  </view>
+                </picker>
+              </view>
+            </view>
+
+            <!-- 比赛控制按钮 -->
+            <view class="match-controls">
+              <button class="control-btn {{isMatchFinished(roundIndex, courtIndex) ? 'finished-btn' : 'finish-btn'}}" 
+                      data-round="{{roundIndex}}" 
+                      data-court="{{courtIndex}}" 
+                      bindtap="{{isMatchFinished(roundIndex, courtIndex) ? 'resetMatch' : 'finishMatch'}}">
+                {{isMatchFinished(roundIndex, courtIndex) ? '重新开始' : '完成比赛'}}
+              </button>
+            </view>
+
+            <!-- 比赛结果 -->
+            <view wx:if="{{isMatchFinished(roundIndex, courtIndex)}}" class="match-result">
+              🏆 {{getWinnerText(roundIndex, courtIndex)}}
+              <view class="match-duration" wx:if="{{getMatchDuration(roundIndex, courtIndex)}}">
+                用时: {{getMatchDuration(roundIndex, courtIndex)}}
+              </view>
+            </view>
+          </view>
         </view>
       </view>
     </view>
-  </view>  
+  </view>
 </view>
 

@@ -1,3 +1,6 @@
 {
+  "navigationBarTitleText": "羽毛球比赛助手",
+  "navigationBarBackgroundColor": "#4facfe",
+  "navigationBarTextStyle": "white",
   "usingComponents": {}
 }
